@@ -1,5 +1,5 @@
 import requests
-
+from loguru import logger
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
         response = requests.get(url, headers=headers, params=params)
         print(response.json())
     except requests.exceptions.InvalidURL:
-        print("Неверный URL")
+        logger.exception("Неверный URL")
 
 
 if __name__ == '__main__':
