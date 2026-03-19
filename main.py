@@ -91,16 +91,15 @@ def get_full_client_info(client_id):
 
     query_params = {
         "moduleName": "crm.customer",
-        "className": "ru.edgex.quickresto.modules.crm.customer.CrmCustomer"
+        "className": "ru.edgex.quickresto.modules.crm.customer.CrmCustomer",
+        "objectId": client_id,  # ← objectId идёт в params, не в body
     }
-    # ID клиента передаем в теле запроса как JSON
-    payload = {"id": client_id}
 
     try:
         response = requests.get(
             url,
             params=query_params,
-            json=payload,
+            # json=payload,
             auth=auth,
             headers=HEADERS,
             timeout=30
@@ -111,6 +110,21 @@ def get_full_client_info(client_id):
     except Exception as e:
         print(f"❌ Ошибка при чтении клиента {client_id}: {e}")
         return None
+
+
+def get_client_phone(phone):
+    """Возвращает информацию о клиенте по номеру телефона"""
+    url = f"https://{LAYER_NAME}.quickresto.ru/platform/online/bonuses/filterCustomers"
+
+    payload = {
+        'search': phone,
+        'typeList': ['customer'],
+        'limit': 10,
+        'offset': 0
+    }
+    response = requests.post(url, json=payload, auth=auth, headers=HEADERS, timeout=30)
+    response.raise_for_status()
+    return response.json()
 
 
 if __name__ == "__main__":
@@ -132,9 +146,15 @@ if __name__ == "__main__":
         if len(all_data) > 10:
             print(f"... и еще {len(all_data) - 10} клиентов")
 
-    # Выводим полную структуру первого клиента для отладки
-    if all_data:
-        print("\n🔍 Полная структура первого клиента:")
+    client = get_full_client_info(7677)  # подставь реальный ID
+    if client:
         import json
 
-        print(json.dumps(all_data[0], indent=2, ensure_ascii=False))
+        print(json.dumps(client, indent=2, ensure_ascii=False))
+
+    client = get_client_phone('89142839779')  # подставь реальный номер
+
+    if client:
+        import json
+
+        print(json.dumps(client, indent=2, ensure_ascii=False))
