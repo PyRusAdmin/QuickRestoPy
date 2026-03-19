@@ -359,6 +359,10 @@
         <a class="sidebar-link" onclick="show('sorting')">↕️ Сортировка</a>
         <a class="sidebar-link" onclick="show('pagination')">📄 Пагинация</a>
 
+        <div class="sidebar-section">CRM / Bonuses</div>
+        <a class="sidebar-link" onclick="show('bonuses-filter')">🔍 filterCustomers</a>
+        <a class="sidebar-link" onclick="show('bonuses-put')">✏️ putCustomer</a>
+
         <div class="sidebar-section">Модули</div>
         <a class="sidebar-link" onclick="show('modules')">📦 Все модули</a>
 
@@ -612,7 +616,7 @@ new_customer = <span class="fn">create_customer</span>(<span class="str">'Ива
     r.<span class="fn">raise_for_status</span>()
     <span class="kw">return</span> r.<span class="fn">json</span>()
 
-<span class="fn">update_customer</span>(<span class="num">42</span>, email=<span class="str">'ivan@mail.ru'</span>, name=<span class="str">'Иван Обновлённый'</span>)</pre>
+<span class="fn">update_customer</span>(<span class="num">42</span>, email=<span class="str">'<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a5ccd3c4cbe5c8c4ccc98bd7d0">[email&#160;protected]</a>'</span>, name=<span class="str">'Иван Обновлённый'</span>)</pre>
                 </div>
             </div>
         </div>
@@ -772,6 +776,95 @@ all_dishes = <span class="fn">fetch_all</span>(<span class="str">'dish.dish'</sp
             </div>
         </div>
 
+        <!-- BONUSES FILTER -->
+        <div class="section" id="bonuses-filter">
+            <div class="section-title"><span class="dot"></span>filterCustomers — поиск клиента</div>
+            <p class="section-desc">Специализированный эндпоинт поиска клиентов по имени, телефону, email или любой строке. Не требует <code>moduleName</code> и <code>className</code> — работает только с клиентами CRM.</p>
+
+            <div class="alert info">ℹ️ URL отличается от стандартного — здесь нет <code>/api/</code>. Путь: <code>/bonuses/filterCustomers</code></div>
+
+            <div class="card">
+                <div class="card-title"><span class="method post">POST</span> /bonuses/filterCustomers</div>
+                <table class="param-table">
+                    <tr><th>Параметр</th><th>Тип</th><th>Где</th><th>Описание</th></tr>
+                    <tr><td>search</td><td>string</td><td>body</td><td>Строка поиска (имя, телефон, email) <span class="req">*</span></td></tr>
+                    <tr><td>typeList</td><td>array</td><td>body</td><td>Всегда <code>["customer"]</code> <span class="req">*</span></td></tr>
+                    <tr><td>limit</td><td>integer</td><td>body</td><td>Макс. кол-во результатов <span class="opt">необяз.</span></td></tr>
+                    <tr><td>offset</td><td>integer</td><td>body</td><td>Смещение <span class="opt">необяз.</span></td></tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример — найти клиента по телефону</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">find_customer</span>(search: str) -> list:
+    <span class="str">"""Поиск клиента по телефону, имени или email"""</span>
+    url = f<span class="str">'{BASE_URL}/bonuses/filterCustomers'</span>
+    <span class="cmt"># Обратите внимание: нет params с moduleName/className!</span>
+    payload = {
+        <span class="str">'search'</span>: search,
+        <span class="str">'typeList'</span>: [<span class="str">'customer'</span>],
+        <span class="str">'limit'</span>: <span class="num">10</span>,
+        <span class="str">'offset'</span>: <span class="num">0</span>,
+    }
+    r = session.<span class="fn">post</span>(url, json=payload)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()
+
+<span class="cmt"># Можно искать по-разному:</span>
+<span class="fn">find_customer</span>(<span class="str">'+79991234567'</span>)   <span class="cmt"># по телефону</span>
+<span class="fn">find_customer</span>(<span class="str">'Иван Петров'</span>)     <span class="cmt"># по имени</span>
+<span class="fn">find_customer</span>(<span class="str">'ivan@mail.ru'</span>)    <span class="cmt"># по email</span></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Сравнение с /api/list</div>
+                <table class="param-table">
+                    <tr><th></th><th>/bonuses/filterCustomers</th><th>/api/list (crm.customer)</th></tr>
+                    <tr><td>HTTP метод</td><td>POST</td><td>GET</td></tr>
+                    <tr><td>Поиск по строке</td><td style="color:var(--green)">✓ есть</td><td style="color:var(--red)">✗ нет</td></tr>
+                    <tr><td>moduleName/className</td><td style="color:var(--green)">не нужны</td><td style="color:var(--red)">обязательны</td></tr>
+                    <tr><td>Фильтры по полям</td><td style="color:var(--red)">✗ нет</td><td style="color:var(--green)">✓ есть</td></tr>
+                    <tr><td>Когда использовать</td><td>Поиск по строке</td><td>Получить всех / фильтр по полю</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- BONUSES PUT -->
+        <div class="section" id="bonuses-put">
+            <div class="section-title"><span class="dot"></span>putCustomer — редактировать клиента</div>
+            <p class="section-desc">Ещё один специализированный эндпоинт CRM для обновления данных клиента. Альтернатива <code>/api/update</code> для модуля клиентов.</p>
+
+            <div class="alert warn">⚠️ URL: <code>/bonuses/putCustomer</code> — без <code>/api/</code>, метод POST, данные в body.</div>
+
+            <div class="card">
+                <div class="card-title"><span class="method post">POST</span> /bonuses/putCustomer</div>
+                <table class="param-table">
+                    <tr><th>Параметр</th><th>Тип</th><th>Где</th><th>Описание</th></tr>
+                    <tr><td>id</td><td>integer</td><td>body</td><td>ID клиента <span class="req">*</span></td></tr>
+                    <tr><td>поля клиента</td><td>object</td><td>body</td><td>Поля для изменения</td></tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">put_customer</span>(customer_id: <span class="fn">int</span>, **fields) -> dict:
+    <span class="str">"""Обновить данные клиента через bonuses API"""</span>
+    url = f<span class="str">'{BASE_URL}/bonuses/putCustomer'</span>
+    payload = {<span class="str">'id'</span>: customer_id, **fields}
+    r = session.<span class="fn">post</span>(url, json=payload)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()
+
+<span class="fn">put_customer</span>(<span class="num">42</span>, email=<span class="str">'new@mail.ru'</span>, firstName=<span class="str">'Иван'</span>)</pre>
+                </div>
+            </div>
+        </div>
+
         <!-- MODULES -->
         <div class="section" id="modules">
             <div class="section-title"><span class="dot"></span>Все модули API</div>
@@ -808,6 +901,8 @@ all_dishes = <span class="fn">fetch_all</span>(<span class="str">'dish.dish'</sp
                             <option value="create">create (создать)</option>
                             <option value="update">update (изменить)</option>
                             <option value="remove">remove (удалить)</option>
+                            <option value="filterCustomers">bonuses/filterCustomers (поиск клиента)</option>
+                            <option value="putCustomer">bonuses/putCustomer (редактировать клиента)</option>
                         </select>
                     </div>
                 </div>
@@ -843,7 +938,7 @@ all_dishes = <span class="fn">fetch_all</span>(<span class="str">'dish.dish'</sp
     </main>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // Navigation
     function show(id) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -934,22 +1029,30 @@ all_dishes = <span class="fn">fetch_all</span>(<span class="str">'dish.dish'</sp
         const objId = document.getElementById('g-id').value || '1';
         const limit = document.getElementById('g-limit').value || '100';
 
-        const baseUrl = `https://${cloud}.quickresto.ru/platform/online`;
+        const baseUrl = 'https://' + cloud + '.quickresto.ru/platform/online';
+        const header = "import requests\n\nsession = requests.Session()\nsession.auth = ('" + login + "', '" + pw + "')\nsession.headers.update({\n    'Content-Type': 'application/json',\n    'Connection': 'keep-alive',\n})\n\nBASE_URL = '" + baseUrl + "'\n\n";
+        const params = "params = {\n    'moduleName': '" + mod + "',\n    'className': '" + cls + "',\n}";
 
-        let code = `import requests\n\nsession = requests.Session()\nsession.auth = ('${login}', '${pw}')\nsession.headers.update({\n    'Content-Type': 'application/json',\n    'Connection': 'keep-alive',\n})\n\nBASE_URL = '${baseUrl}'\n\n`;
-
-        const params = `params = {\n    'moduleName': '${mod}',\n    'className': '${cls}',\n}`;
+        let code = header;
 
         if (action === 'read') {
-            code += `${params.replace('}', `    'objectId': ${objId},\n}`)}\n\nr = session.get(f'{BASE_URL}/api/read', params=params)\nr.raise_for_status()\ndata = r.json()\nprint(data)`;
+            code += "params = {\n    'moduleName': '" + mod + "',\n    'className': '" + cls + "',\n    'objectId': " + objId + ",\n}\n\nr = session.get(f'{BASE_URL}/api/read', params=params)\nr.raise_for_status()\ndata = r.json()\nprint(data)";
         } else if (action === 'list') {
-            code += `${params}\nbody = {'limit': ${limit}, 'offset': 0}\n\nr = session.get(f'{BASE_URL}/api/list', params=params, json=body)\nr.raise_for_status()\ndata = r.json()\nprint(f'Получено: {len(data)} объектов')`;
+            code += params + "\nbody = {'limit': " + limit + ", 'offset': 0}\n\nr = session.get(f'{BASE_URL}/api/list', params=params, json=body)\nr.raise_for_status()\ndata = r.json()\nprint('Получено:', len(data), 'объектов')";
         } else if (action === 'create') {
-            code += `${params}\nbody = {\n    # добавьте поля объекта\n    'name': 'Новый объект',\n}\n\nr = session.post(f'{BASE_URL}/api/create', params=params, json=body)\nr.raise_for_status()\ncreated = r.json()\nprint('Создан с ID:', created['id'])`;
+            code += params + "\nbody = {\n    # добавьте поля объекта\n    'name': 'Новый объект',\n}\n\nr = session.post(f'{BASE_URL}/api/create', params=params, json=body)\nr.raise_for_status()\ncreated = r.json()\nprint('Создан с ID:', created['id'])";
         } else if (action === 'update') {
-            code += `${params}\nbody = {\n    'id': ${objId},\n    # добавьте поля для изменения\n    'name': 'Новое имя',\n}\n\nr = session.post(f'{BASE_URL}/api/update', params=params, json=body)\nr.raise_for_status()\nupdated = r.json()\nprint('Обновлено:', updated)`;
+            code += params + "\nbody = {\n    'id': " + objId + ",\n    # добавьте поля для изменения\n    'name': 'Новое имя',\n}\n\nr = session.post(f'{BASE_URL}/api/update', params=params, json=body)\nr.raise_for_status()\nupdated = r.json()\nprint('Обновлено:', updated)";
         } else if (action === 'remove') {
-            code += `${params}\n\nr = session.post(f'{BASE_URL}/api/remove', params=params, json={'id': ${objId}})\nr.raise_for_status()\nprint('Удалено:', r.json())`;
+            code += params + "\n\nr = session.post(f'{BASE_URL}/api/remove', params=params, json={'id': " + objId + "})\nr.raise_for_status()\nprint('Удалено:', r.json())";
+        } else if (action === 'filterCustomers') {
+            code += "# /bonuses/filterCustomers — moduleName и className не нужны!\n";
+            code += "url = f'{BASE_URL}/bonuses/filterCustomers'\n\npayload = {\n    'search': '+79991234567',  # телефон, имя или email\n    'typeList': ['customer'],\n    'limit': " + limit + ",\n    'offset': 0,\n}\n\n";
+            code += "r = session.post(url, json=payload)\nr.raise_for_status()\nresults = r.json()\nprint('Найдено:', len(results), 'клиентов')\nfor c in results:\n    print(c.get('id'), c.get('firstName'), c.get('phoneNumber'))";
+        } else if (action === 'putCustomer') {
+            code += "# /bonuses/putCustomer — moduleName и className не нужны!\n";
+            code += "url = f'{BASE_URL}/bonuses/putCustomer'\n\npayload = {\n    'id': " + objId + ",\n    # добавьте поля для изменения\n    'firstName': 'Иван',\n    'email': 'ivan@mail.ru',\n}\n\n";
+            code += "r = session.post(url, json=payload)\nr.raise_for_status()\nprint('Обновлено:', r.json())";
         }
 
         document.getElementById('gen-code').textContent = code;

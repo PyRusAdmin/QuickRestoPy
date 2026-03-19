@@ -3,6 +3,9 @@ from requests.auth import HTTPBasicAuth
 from dotenv import load_dotenv
 import os
 from loguru import logger
+from rich.console import Console
+
+console = Console()
 
 # https://quickresto.ru/api/
 
@@ -127,7 +130,47 @@ def get_client_phone(phone):
     return response.json()
 
 
+def create_client(name, phone):
+    """Создание нового клиента"""
+    try:
+        url = f"{BASE_URL}/create"
+
+        query_params = {
+            "moduleName": "crm.customer",
+            "className": "ru.edgex.quickresto.modules.crm.customer.CrmCustomer"
+        }
+
+        body = {
+            "firstName": name,
+            "contactMethods": [
+                {
+                    "type": "phoneNumber",
+                    "value": phone
+                }
+            ]
+        }
+
+        # post - отправка запроса
+        # get - получение данных
+
+        response = requests.post(
+            url,
+            params=query_params,
+            json=body,
+            auth=auth,
+            headers=HEADERS,
+            timeout=30
+        )
+        response.raise_for_status()
+        return response.json()
+    except Exception as e:
+        logger.exception(e)
+
+
 if __name__ == "__main__":
+
+    """получение всех клиентов"""
+
     all_data = get_all_clients()
 
     print("\n" + "=" * 50)
@@ -146,11 +189,15 @@ if __name__ == "__main__":
         if len(all_data) > 10:
             print(f"... и еще {len(all_data) - 10} клиентов")
 
+    """Получение клиента по ID"""
+
     client = get_full_client_info(7677)  # подставь реальный ID
     if client:
         import json
 
         print(json.dumps(client, indent=2, ensure_ascii=False))
+
+    """Получение клиента по номеру телефона"""
 
     client = get_client_phone('89142839779')  # подставь реальный номер
 
@@ -158,3 +205,25 @@ if __name__ == "__main__":
         import json
 
         print(json.dumps(client, indent=2, ensure_ascii=False))
+
+        console.print_json(json.dumps(client, indent=2, ensure_ascii=False))
+
+    """Создание нового клиента"""
+
+    client = create_client('Виталий', '79493531398')
+    if client:
+        import json
+
+        print(json.dumps(client, indent=2, ensure_ascii=False))
+
+
+    """Получение клиента по номеру телефона"""
+
+    client = get_client_phone('79493531398')  # подставь реальный номер
+
+    if client:
+        import json
+
+        print(json.dumps(client, indent=2, ensure_ascii=False))
+
+        console.print_json(json.dumps(client, indent=2, ensure_ascii=False))
