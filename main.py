@@ -87,7 +87,6 @@ def get_all_clients():
 
 def get_full_client_info(client_id):
     """Возвращает полную информацию об одном конкретном пользователе (клиенте)"""
-    # Исправлено: /read вместо /red
     url = f"{BASE_URL}/read"
 
     query_params = {
@@ -137,4 +136,5 @@ if __name__ == "__main__":
     if all_data:
         print("\n🔍 Полная структура первого клиента:")
         import json
+
         print(json.dumps(all_data[0], indent=2, ensure_ascii=False))
