@@ -130,7 +130,7 @@ def get_client_phone(phone):
     return response.json()
 
 
-def create_client(name, phone):
+def create_client(name_customer, phone_customer):
     """Создание нового клиента"""
     try:
         url = f"{BASE_URL}/create"
@@ -141,11 +141,11 @@ def create_client(name, phone):
         }
 
         body = {
-            "firstName": name,
+            "firstName": name_customer,
             "contactMethods": [
                 {
                     "type": "phoneNumber",
-                    "value": phone
+                    "value": phone_customer
                 }
             ]
         }
@@ -163,6 +163,33 @@ def create_client(name, phone):
         )
         response.raise_for_status()
         return response.json()
+    except Exception as e:
+        logger.exception(e)
+
+
+def update_customer_bonus(customer_id: int, amount: float, customer_phone):
+    """Редактирование бонусных балов для клиента"""
+    try:
+        logger.info(f"Редактирование бонусных балов для клиента {customer_id}")
+
+        url = f"https://{LAYER_NAME}.quickresto.ru/platform/online/bonuses/creditHold"
+
+        body = {
+            "customerToken": {
+                "type": "phone",  # ← тип токена: телефон
+                "entry": "manual",  # ← способ ввода: вручную
+                "key": customer_phone  # ← сам номер телефона
+            },
+            "accountType": {
+                "accountGuid": "bonus_account_type-1"  # ← из данных клиента
+            },
+            "amount": amount
+        }
+
+        response = requests.post(url, json=body, auth=auth, headers=HEADERS, timeout=30)
+        response.raise_for_status()
+        return response.json()
+
     except Exception as e:
         logger.exception(e)
 
@@ -234,3 +261,42 @@ if __name__ == "__main__":
         print(json.dumps(client, indent=2, ensure_ascii=False))
 
         console.print_json(json.dumps(client, indent=2, ensure_ascii=False))
+
+    """Редактирование клиента"""
+
+    result = update_customer_bonus(7678, 0, '79493531398')
+
+    if result:
+        console.print_json(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        print("Функция вернула None — смотри логи ошибок")
+
+    """Получение клиента по ID"""
+
+    client = get_full_client_info(7678)
+
+    if not client:
+        logger.error("Клиент не найден")
+    else:
+        # Личные данные
+        name = client.get('firstName', '—')
+        surname = client.get('lastName', '—')
+        guid = client.get('customerGuid', '—')
+
+        # Телефон
+        contacts = client.get('contactMethods', [])
+        phone = contacts[0].get('value') if contacts else '—'
+
+        # Баланс
+        accounts = client.get('accounts', [])
+        if accounts:
+            balance = accounts[0].get('accountBalance', {})
+            ledger = balance.get('ledger', 0)
+            available = balance.get('available', 0)
+        else:
+            ledger = available = 0
+
+        logger.info(f"Клиент:    {name} {surname}")
+        logger.info(f"Телефон:   {phone}")
+        logger.info(f"GUID:      {guid}")
+        logger.info(f"Баланс:    {ledger} (доступно: {available})")
