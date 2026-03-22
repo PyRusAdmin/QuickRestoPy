@@ -189,6 +189,8 @@ if __name__ == "__main__":
         if len(all_data) > 10:
             print(f"... и еще {len(all_data) - 10} клиентов")
 
+    print(100 * "#")
+
     """Получение клиента по ID"""
 
     client = get_full_client_info(7677)  # подставь реальный ID
@@ -196,6 +198,8 @@ if __name__ == "__main__":
         import json
 
         print(json.dumps(client, indent=2, ensure_ascii=False))
+
+    print(100 * "#")
 
     """Получение клиента по номеру телефона"""
 
@@ -208,6 +212,8 @@ if __name__ == "__main__":
 
         console.print_json(json.dumps(client, indent=2, ensure_ascii=False))
 
+    print(100 * "#")
+
     """Создание нового клиента"""
 
     client = create_client('Виталий', '79493531398')
@@ -216,6 +222,7 @@ if __name__ == "__main__":
 
         print(json.dumps(client, indent=2, ensure_ascii=False))
 
+    print(100 * "#")
 
     """Получение клиента по номеру телефона"""
 
