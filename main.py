@@ -118,9 +118,6 @@ def get_full_client_info(client_id):
         return None
 
 
-
-
-
 def update_customer_bonus(customer_id: int, amount: float, customer_phone):
     """Редактирование бонусных балов для клиента"""
     try:
@@ -179,8 +176,6 @@ if __name__ == "__main__":
         print(json.dumps(client, indent=2, ensure_ascii=False))
 
     print(100 * "#")
-
-
 
     """Получение клиента по номеру телефона. Номер телефона должен быть в формате 79991234567"""
 

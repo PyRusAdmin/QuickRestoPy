@@ -6,7 +6,7 @@ import requests
 from config import console
 
 
-def get_client_phone(layer_name_quickresto, phone_number, auth, headers):
+def get_customer_by_phone(layer_name_quickresto, phone_number, auth, headers):
     """
     Возвращает информацию о клиенте по номеру телефона
 
@@ -31,7 +31,7 @@ def get_client_phone(layer_name_quickresto, phone_number, auth, headers):
 
 def print_client_info(layer_name_quickresto, phone_number, auth, headers):
     """Выводит информацию о клиенте по номеру телефона в формате JSON из QuickResto"""
-    client = get_client_phone(layer_name_quickresto, phone_number, auth, headers)
+    client = get_customer_by_phone(layer_name_quickresto, phone_number, auth, headers)
 
     if client:
         print(json.dumps(client, indent=2, ensure_ascii=False))

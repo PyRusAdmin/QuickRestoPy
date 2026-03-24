@@ -45,4 +45,4 @@ def delete_customer(customer_id: int, base_url, auth, headers):
 
 """Удаление клиента по ID"""
 
-delete_customer(customer_id=7678, base_url=base_url, auth=auth, headers=headers)
+delete_customer(customer_id=7711, base_url=base_url, auth=auth, headers=headers)
