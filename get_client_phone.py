@@ -29,11 +29,13 @@ def get_client_phone(layer_name_quickresto, phone, auth, headers):
 
 """Получение клиента по номеру телефона"""
 
-client = get_client_phone('89142839779')  # подставь реальный номер
 
-if client:
-    print(json.dumps(client, indent=2, ensure_ascii=False))
+def print_client_info(phone_number):
+    """Выводит информацию о клиенте по номеру телефона в формате JSON из QuickResto"""
+    client = get_client_phone('layer_name_quickresto', phone_number, auth, headers)
 
-    console.print_json(json.dumps(client, indent=2, ensure_ascii=False))
+    if client:
+        print(json.dumps(client, indent=2, ensure_ascii=False))
+        console.print_json(json.dumps(client, indent=2, ensure_ascii=False))
 
-print(100 * "#")
+    print(100 * "#")

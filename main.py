@@ -6,9 +6,6 @@ import requests
 from dotenv import load_dotenv
 from loguru import logger
 from requests.auth import HTTPBasicAuth
-from rich.console import Console
-
-console = Console()
 
 # https://quickresto.ru/api/
 
