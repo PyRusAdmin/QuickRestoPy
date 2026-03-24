@@ -3,13 +3,15 @@ import json
 
 import requests
 
+from config import console
 
-def get_client_phone(layer_name_quickresto, phone, auth, headers):
+
+def get_client_phone(layer_name_quickresto, phone_number, auth, headers):
     """
     Возвращает информацию о клиенте по номеру телефона
 
     :param layer_name_quickresto: название слоя quickresto
-    :param phone: номер телефона
+    :param phone_number: номер телефона
     :param auth: авторизация в quickresto
     :param headers: заголовки запроса
     :return: информация о клиенте
@@ -17,7 +19,7 @@ def get_client_phone(layer_name_quickresto, phone, auth, headers):
     url = f"https://{layer_name_quickresto}.quickresto.ru/platform/online/bonuses/filterCustomers"
 
     payload = {
-        'search': phone,
+        'search': phone_number,
         'typeList': ['customer'],
         'limit': 10,
         'offset': 0
@@ -27,12 +29,9 @@ def get_client_phone(layer_name_quickresto, phone, auth, headers):
     return response.json()
 
 
-"""Получение клиента по номеру телефона"""
-
-
-def print_client_info(phone_number):
+def print_client_info(layer_name_quickresto, phone_number, auth, headers):
     """Выводит информацию о клиенте по номеру телефона в формате JSON из QuickResto"""
-    client = get_client_phone('layer_name_quickresto', phone_number, auth, headers)
+    client = get_client_phone(layer_name_quickresto, phone_number, auth, headers)
 
     if client:
         print(json.dumps(client, indent=2, ensure_ascii=False))

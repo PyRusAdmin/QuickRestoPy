@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 from loguru import logger
 from requests.auth import HTTPBasicAuth
 
+from config import console
+from get_client_phone import print_client_info
+
 # https://quickresto.ru/api/
 
 # Загружаем переменные из файла .env (override=True переопределяет системные переменные)
@@ -31,7 +34,7 @@ BASE_URL: Автоматически подставляет имя «облак�
 
 BASE_URL = f"https://{layer_name_quickresto}.quickresto.ru/platform/online/api"
 auth = HTTPBasicAuth(username_quickresto, password_quickresto)
-HEADERS = {"Content-Type": "application/json"}
+headers = {"Content-Type": "application/json"}
 
 
 def get_all_clients():
@@ -60,7 +63,7 @@ def get_all_clients():
                 params=query_params,
                 json=payload,
                 auth=auth,
-                headers=HEADERS,
+                headers=headers,
                 timeout=30
             )
             response.raise_for_status()
@@ -104,7 +107,7 @@ def get_full_client_info(client_id):
             params=query_params,
             # json=payload,
             auth=auth,
-            headers=HEADERS,
+            headers=headers,
             timeout=30
         )
         response.raise_for_status()
@@ -143,7 +146,7 @@ def create_client(name_customer, phone_customer):
             params=query_params,
             json=body,
             auth=auth,
-            headers=HEADERS,
+            headers=headers,
             timeout=30
         )
         response.raise_for_status()
@@ -171,7 +174,7 @@ def update_customer_bonus(customer_id: int, amount: float, customer_phone):
             "amount": amount
         }
 
-        response = requests.post(url, json=body, auth=auth, headers=HEADERS, timeout=30)
+        response = requests.post(url, json=body, auth=auth, headers=headers, timeout=30)
         response.raise_for_status()
         return response.json()
 
@@ -219,14 +222,14 @@ if __name__ == "__main__":
 
     print(100 * "#")
 
-    """Получение клиента по номеру телефона"""
+    """Получение клиента по номеру телефона. Номер телефона должен быть в формате 79991234567"""
 
-    # client = get_client_phone('79493531398')  # подставь реальный номер
-    #
-    # if client:
-    #     print(json.dumps(client, indent=2, ensure_ascii=False))
-    #
-    #     console.print_json(json.dumps(client, indent=2, ensure_ascii=False))
+    print_client_info(
+        layer_name_quickresto=layer_name_quickresto,
+        phone_number='79493531398',
+        auth=auth,
+        headers=headers
+    )
 
     """Редактирование клиента"""
 
