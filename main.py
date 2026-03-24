@@ -20,17 +20,17 @@ load_dotenv(
 )
 
 # Достаем данные из окружения
-LAYER_NAME: str = os.getenv("LAYER_NAME")  # Извлекаем значение из .env файла
-USERNAME: str = os.getenv("USERNAME")  # Извлекаем значение из .env файла
-PASSWORD: str = os.getenv("PASSWORD")  # Извлекаем значение из .env файла
+LAYER_NAME_QUICKRESTO: str = os.getenv("LAYER_NAME_QUICKRESTO")  # Извлекаем значение из .env файла
+USERNAME_QUICKRESTO: str = os.getenv("USERNAME_QUICKRESTO")  # Извлекаем значение из .env файла
+PASSWORD_QUICKRESTO: str = os.getenv("PASSWORD_QUICKRESTO")  # Извлекаем значение из .env файла
 
 '''
 HTTPBasicAuth: Quick Resto использует стандартную проверку «Логин:Пароль», зашифрованную в заголовке запроса.
 BASE_URL: Автоматически подставляет имя «облака» (layer) в адрес запроса (username равное layer).
 '''
 
-BASE_URL = f"https://{LAYER_NAME}.quickresto.ru/platform/online/api"
-auth = HTTPBasicAuth(USERNAME, PASSWORD)
+BASE_URL = f"https://{LAYER_NAME_QUICKRESTO}.quickresto.ru/platform/online/api"
+auth = HTTPBasicAuth(USERNAME_QUICKRESTO, PASSWORD_QUICKRESTO)
 HEADERS = {"Content-Type": "application/json"}
 
 
@@ -117,7 +117,7 @@ def get_full_client_info(client_id):
 
 def get_client_phone(phone):
     """Возвращает информацию о клиенте по номеру телефона"""
-    url = f"https://{LAYER_NAME}.quickresto.ru/platform/online/bonuses/filterCustomers"
+    url = f"https://{LAYER_NAME_QUICKRESTO}.quickresto.ru/platform/online/bonuses/filterCustomers"
 
     payload = {
         'search': phone,
@@ -172,7 +172,7 @@ def update_customer_bonus(customer_id: int, amount: float, customer_phone):
     try:
         logger.info(f"Редактирование бонусных балов для клиента {customer_id}")
 
-        url = f"https://{LAYER_NAME}.quickresto.ru/platform/online/bonuses/creditHold"
+        url = f"https://{LAYER_NAME_QUICKRESTO}.quickresto.ru/platform/online/bonuses/creditHold"
 
         body = {
             "customerToken": {
