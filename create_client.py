@@ -9,7 +9,16 @@ from main import base_url, auth, headers
 
 
 def create_client(name_customer, phone_customer, base_url, auth, headers):
-    """Создание нового клиента"""
+    """
+    Создание нового клиента
+
+    :param name_customer: имя клиента
+    :param phone_customer: телефон клиента
+    :param base_url: базовый URL
+    :param auth: аутентификация
+    :param headers: заголовки запроса
+    :return: результат запроса
+    """
     try:
         url = f"{base_url}/create"
 
