@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 import os
 
 import requests
@@ -7,8 +6,8 @@ from dotenv import load_dotenv
 from loguru import logger
 from requests.auth import HTTPBasicAuth
 
-from config import console
 from get_client_phone import print_client_info
+from get_full_client_info import get_full_client_info
 
 # https://quickresto.ru/api/
 
@@ -91,9 +90,6 @@ def get_all_clients():
     return all_clients
 
 
-
-
-
 if __name__ == "__main__":
 
     """получение всех клиентов"""
@@ -126,15 +122,6 @@ if __name__ == "__main__":
         auth=auth,  # авторизация
         headers=headers  # заголовки
     )
-
-    """Редактирование клиента"""
-
-    result = update_customer_bonus(7678, 0, '79493531398')
-
-    if result:
-        console.print_json(json.dumps(result, indent=2, ensure_ascii=False))
-    else:
-        print("Функция вернула None — смотри логи ошибок")
 
     """Получение клиента по ID"""
 
