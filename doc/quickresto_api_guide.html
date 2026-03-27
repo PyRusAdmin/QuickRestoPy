@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickResto API — Справочник</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Unbounded:wght@400;700;900&display=swap"
+          rel="stylesheet">
+    <style>
+        :root {
+          --bg: #0d0f14;
+          --surface: #161920;
+          --border: #252830;
+          --accent: #ff5f1f;
+          --accent2: #ffb340;
+          --green: #3dffa0;
+          --blue: #38b6ff;
+          --purple: #b57bff;
+          --red: #ff4e6a;
+          --text: #e8eaf0;
+          --muted: #6b7280;
+          --code-bg: #0a0c10;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+          background: var(--bg);
+          color: var(--text);
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 13px;
+          min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+          background: var(--surface);
+          border-bottom: 1px solid var(--border);
+          padding: 24px 32px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .logo {
+          font-family: 'Unbounded', sans-serif;
+          font-size: 18px;
+          font-weight: 900;
+          color: var(--accent);
+          letter-spacing: -0.5px;
+        }
+        .logo span { color: var(--text); }
+        .badge {
+          background: var(--accent);
+          color: #fff;
+          font-size: 10px;
+          font-weight: 700;
+          padding: 2px 8px;
+          border-radius: 2px;
+          letter-spacing: 1px;
+        }
+        .header-right {
+          margin-left: auto;
+          color: var(--muted);
+          font-size: 11px;
+        }
+
+        /* Layout */
+        .layout {
+          display: grid;
+          grid-template-columns: 220px 1fr;
+          min-height: calc(100vh - 65px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+          background: var(--surface);
+          border-right: 1px solid var(--border);
+          padding: 20px 0;
+          position: sticky;
+          top: 65px;
+          height: calc(100vh - 65px);
+          overflow-y: auto;
+        }
+        .sidebar-section {
+          padding: 8px 16px 4px;
+          font-size: 10px;
+          font-weight: 700;
+          color: var(--muted);
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          margin-top: 12px;
+        }
+        .sidebar-link {
+          display: block;
+          padding: 7px 20px;
+          color: var(--muted);
+          text-decoration: none;
+          font-size: 12px;
+          border-left: 2px solid transparent;
+          transition: all 0.15s;
+          cursor: pointer;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+          color: var(--text);
+          border-left-color: var(--accent);
+          background: rgba(255,95,31,0.06);
+        }
+
+        /* Content */
+        .content {
+          padding: 32px 40px;
+          max-width: 900px;
+        }
+
+        /* Sections */
+        .section {
+          margin-bottom: 48px;
+          display: none;
+        }
+        .section.active { display: block; }
+
+        .section-title {
+          font-family: 'Unbounded', sans-serif;
+          font-size: 20px;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .section-title .dot {
+          width: 8px; height: 8px;
+          border-radius: 50%;
+          background: var(--accent);
+          flex-shrink: 0;
+        }
+        .section-desc {
+          color: var(--muted);
+          margin-bottom: 24px;
+          line-height: 1.7;
+          font-size: 12px;
+        }
+
+        /* Cards */
+        .card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          padding: 20px;
+          margin-bottom: 16px;
+        }
+        .card-title {
+          font-size: 12px;
+          font-weight: 700;
+          color: var(--accent2);
+          margin-bottom: 12px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        /* Method pills */
+        .method {
+          display: inline-block;
+          padding: 2px 8px;
+          border-radius: 3px;
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 1px;
+        }
+        .method.get { background: rgba(61,255,160,0.15); color: var(--green); border: 1px solid rgba(61,255,160,0.3); }
+        .method.post { background: rgba(56,182,255,0.15); color: var(--blue); border: 1px solid rgba(56,182,255,0.3); }
+
+        /* Code blocks */
+        .code-block {
+          background: var(--code-bg);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 16px;
+          overflow-x: auto;
+          position: relative;
+          margin-top: 8px;
+        }
+        .code-block pre {
+          color: var(--text);
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 12px;
+          line-height: 1.65;
+          white-space: pre;
+        }
+        .copy-btn {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: var(--border);
+          border: none;
+          color: var(--muted);
+          padding: 4px 10px;
+          border-radius: 3px;
+          cursor: pointer;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 10px;
+          transition: all 0.15s;
+        }
+        .copy-btn:hover { background: var(--accent); color: #fff; }
+        .copy-btn.copied { background: var(--green); color: #000; }
+
+        /* Syntax colors */
+        .kw { color: var(--purple); }
+        .str { color: var(--green); }
+        .num { color: var(--accent2); }
+        .cmt { color: var(--muted); }
+        .fn { color: var(--blue); }
+        .key { color: #ff8fa3; }
+
+        /* Table */
+        .param-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 8px;
+          font-size: 12px;
+        }
+        .param-table th {
+          text-align: left;
+          padding: 8px 12px;
+          border-bottom: 1px solid var(--border);
+          color: var(--muted);
+          font-size: 10px;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          font-weight: 700;
+        }
+        .param-table td {
+          padding: 9px 12px;
+          border-bottom: 1px solid rgba(37,40,48,0.5);
+          vertical-align: top;
+          line-height: 1.5;
+        }
+        .param-table tr:last-child td { border-bottom: none; }
+        .param-table td:first-child { color: var(--blue); white-space: nowrap; }
+        .param-table td:nth-child(2) { color: var(--purple); }
+        .param-table .req { color: var(--red); font-size: 10px; }
+        .param-table .opt { color: var(--muted); font-size: 10px; }
+
+        /* Tags row */
+        .tags-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 8px;
+        }
+        .tag {
+          background: rgba(56,182,255,0.1);
+          border: 1px solid rgba(56,182,255,0.2);
+          color: var(--blue);
+          padding: 4px 10px;
+          border-radius: 3px;
+          font-size: 11px;
+          cursor: pointer;
+          transition: all 0.15s;
+        }
+        .tag:hover { background: rgba(56,182,255,0.25); }
+
+        /* Filter ops */
+        .ops-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+          margin-top: 8px;
+        }
+        .op-item {
+          background: var(--code-bg);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 8px 12px;
+        }
+        .op-name { color: var(--accent2); font-weight: 700; margin-bottom: 2px; }
+        .op-desc { color: var(--muted); font-size: 11px; }
+
+        /* Divider */
+        .divider {
+          border: none;
+          border-top: 1px solid var(--border);
+          margin: 20px 0;
+        }
+
+        /* Alert */
+        .alert {
+          border-radius: 4px;
+          padding: 12px 16px;
+          margin-bottom: 16px;
+          font-size: 12px;
+          line-height: 1.6;
+        }
+        .alert.info { background: rgba(56,182,255,0.08); border-left: 3px solid var(--blue); color: var(--text); }
+        .alert.warn { background: rgba(255,179,64,0.08); border-left: 3px solid var(--accent2); color: var(--text); }
+
+        /* Config form */
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .config-input { display: flex; flex-direction: column; gap: 4px; }
+        .config-input label { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+        .config-input input {
+          background: var(--code-bg);
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          padding: 8px 12px;
+          color: var(--text);
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 12px;
+          outline: none;
+          transition: border-color 0.15s;
+        }
+        .config-input input:focus { border-color: var(--accent); }
+        .gen-btn {
+          background: var(--accent);
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          padding: 10px 20px;
+          font-family: 'Unbounded', sans-serif;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: opacity 0.15s;
+          letter-spacing: 0.5px;
+        }
+        .gen-btn:hover { opacity: 0.85; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">QR<span>API</span></div>
+    <div class="badge">v2.92</div>
+    <div class="header-right">Quick Resto Back Office API · Справочник</div>
+</div>
+
+<div class="layout">
+    <nav class="sidebar">
+        <div class="sidebar-section">Начало</div>
+        <a class="sidebar-link active" onclick="show('auth')">🔐 Авторизация</a>
+        <a class="sidebar-link" onclick="show('structure')">🏗 Структура URL</a>
+
+        <div class="sidebar-section">Запросы</div>
+        <a class="sidebar-link" onclick="show('read')">📄 read — получить</a>
+        <a class="sidebar-link" onclick="show('list')">📋 list — список</a>
+        <a class="sidebar-link" onclick="show('create')">➕ create — создать</a>
+        <a class="sidebar-link" onclick="show('update')">✏️ update — изменить</a>
+        <a class="sidebar-link" onclick="show('remove')">🗑 remove — удалить</a>
+
+        <div class="sidebar-section">Параметры</div>
+        <a class="sidebar-link" onclick="show('filters')">🔍 Фильтрация</a>
+        <a class="sidebar-link" onclick="show('sorting')">↕️ Сортировка</a>
+        <a class="sidebar-link" onclick="show('pagination')">📄 Пагинация</a>
+
+        <div class="sidebar-section">CRM / Bonuses</div>
+        <a class="sidebar-link" onclick="show('bonuses-filter')">🔍 filterCustomers</a>
+        <a class="sidebar-link" onclick="show('bonuses-put')">✏️ putCustomer</a>
+
+        <div class="sidebar-section">Модули</div>
+        <a class="sidebar-link" onclick="show('modules')">📦 Все модули</a>
+
+        <div class="sidebar-section">Готовый код</div>
+        <a class="sidebar-link" onclick="show('generator')">⚡ Генератор запросов</a>
+    </nav>
+
+    <main class="content">
+
+        <!-- AUTH -->
+        <div class="section active" id="auth">
+            <div class="section-title"><span class="dot"></span>Авторизация</div>
+            <p class="section-desc">API использует HTTP Basic Auth — логин и пароль от аккаунта QuickResto,
+                закодированные в Base64.</p>
+
+            <div class="card">
+                <div class="card-title">🔑 Как это работает</div>
+                <table class="param-table">
+                    <tr>
+                        <th>Что</th>
+                        <th>Значение</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td>Метод</td>
+                        <td>HTTP Basic Auth</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Заголовок</td>
+                        <td>Authorization: Basic &lt;base64(login:password)&gt;</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Content-Type</td>
+                        <td>application/json</td>
+                        <td class="req">обязателен</td>
+                    </tr>
+                    <tr>
+                        <td>Connection</td>
+                        <td>keep-alive</td>
+                        <td class="req">обязателен</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Python — базовая сессия</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">import</span> requests
+
+<span class="cmt"># Настройте один раз — используйте везде</span>
+session = requests.<span class="fn">Session</span>()
+session.auth = (<span class="str">'your_login'</span>, <span class="str">'your_password'</span>)
+session.headers.<span class="fn">update</span>({
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+    <span class="str">'Connection'</span>: <span class="str">'keep-alive'</span>,
+})
+
+BASE_URL = <span class="str">'https://demo.quickresto.ru/platform/online'</span>
+<span class="cmt"># Замените 'demo' на имя вашего облака!</span></pre>
+                </div>
+            </div>
+
+            <div class="alert info">ℹ️ Имя облака (layer_name) — это поддомен вашего QuickResto. Например, если вы
+                заходите на <code>myfood.quickresto.ru</code>, то layer_name = <code>myfood</code>.
+            </div>
+        </div>
+
+        <!-- STRUCTURE -->
+        <div class="section" id="structure">
+            <div class="section-title"><span class="dot"></span>Структура URL</div>
+            <p class="section-desc">Все эндпоинты строятся по единому принципу: <strong>действие</strong> + <strong>модуль</strong>
+                + <strong>класс</strong>.</p>
+
+            <div class="card">
+                <div class="card-title">Шаблон</div>
+                <div class="code-block">
+          <pre><span class="fn">https://</span><span class="key">{layer_name}</span><span class="fn">.quickresto.ru/platform/online</span><span
+                  class="str">/api/{action}</span>
+    <span class="kw">?moduleName=</span><span class="key">{module}</span>
+    <span class="kw">&className=</span><span class="key">{class}</span>
+    <span class="kw">&objectId=</span><span class="num">{id}</span>   <span class="cmt">← только для /read</span></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Действия (action)</div>
+                <table class="param-table">
+                    <tr>
+                        <th>action</th>
+                        <th>HTTP</th>
+                        <th>Что делает</th>
+                    </tr>
+                    <tr>
+                        <td>/api/read</td>
+                        <td><span class="method get">GET</span></td>
+                        <td>Получить один объект по ID</td>
+                    </tr>
+                    <tr>
+                        <td>/api/list</td>
+                        <td><span class="method get">GET</span></td>
+                        <td>Получить список объектов</td>
+                    </tr>
+                    <tr>
+                        <td>/api/create</td>
+                        <td><span class="method post">POST</span></td>
+                        <td>Создать объект</td>
+                    </tr>
+                    <tr>
+                        <td>/api/update</td>
+                        <td><span class="method post">POST</span></td>
+                        <td>Изменить объект</td>
+                    </tr>
+                    <tr>
+                        <td>/api/remove</td>
+                        <td><span class="method post">POST</span></td>
+                        <td>Удалить объект</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Пример — клиенты CRM</div>
+                <div class="code-block">
+          <pre><span class="cmt"># module  = crm.customer</span>
+<span class="cmt"># class   = ru.edgex.quickresto.modules.crm.customer.CrmCustomer</span>
+
+GET /api/list
+  ?moduleName=<span class="str">crm.customer</span>
+  &className=<span class="str">ru.edgex.quickresto.modules.crm.customer.CrmCustomer</span></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- READ -->
+        <div class="section" id="read">
+            <div class="section-title"><span class="dot"></span>read — получить объект</div>
+            <p class="section-desc">Возвращает один объект со всеми вложенными подобъектами. Нужен
+                <strong>objectId</strong>.</p>
+
+            <div class="card">
+                <div class="card-title"><span class="method get">GET</span> /api/read</div>
+                <table class="param-table">
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Тип</th>
+                        <th>Где</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>moduleName</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Имя модуля <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>className</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Полное имя класса <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>objectId</td>
+                        <td>integer</td>
+                        <td>query</td>
+                        <td>ID объекта <span class="req">*</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример — получить клиента по ID</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">get_customer</span>(customer_id: <span class="fn">int</span>) -> dict:
+    params = {
+        <span class="str">'moduleName'</span>: <span class="str">'crm.customer'</span>,
+        <span class="str">'className'</span>: <span
+                                class="str">'ru.edgex.quickresto.modules.crm.customer.CrmCustomer'</span>,
+        <span class="str">'objectId'</span>: customer_id,
+    }
+    r = session.<span class="fn">get</span>(f<span class="str">'{BASE_URL}/api/read'</span>, params=params)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()
+
+customer = <span class="fn">get_customer</span>(<span class="num">42</span>)
+<span class="fn">print</span>(customer[<span class="str">'name'</span>])</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIST -->
+        <div class="section" id="list">
+            <div class="section-title"><span class="dot"></span>list — список объектов</div>
+            <p class="section-desc">Возвращает массив объектов. Поддерживает фильтрацию, сортировку и пагинацию.
+                Параметры <code>limit</code>/<code>offset</code> передаются в <strong>теле запроса</strong> (JSON body),
+                остальное — в query.</p>
+
+            <div class="card">
+                <div class="card-title"><span class="method get">GET</span> /api/list</div>
+                <table class="param-table">
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Тип</th>
+                        <th>Где</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>moduleName</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Имя модуля <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>className</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Полное имя класса <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>limit</td>
+                        <td>integer</td>
+                        <td>body</td>
+                        <td>Макс. кол-во записей <span class="opt">необяз.</span></td>
+                    </tr>
+                    <tr>
+                        <td>offset</td>
+                        <td>integer</td>
+                        <td>body</td>
+                        <td>Смещение (пагинация) <span class="opt">необяз.</span></td>
+                    </tr>
+                    <tr>
+                        <td>filters</td>
+                        <td>array</td>
+                        <td>query</td>
+                        <td>Фильтры <span class="opt">необяз.</span></td>
+                    </tr>
+                    <tr>
+                        <td>sortFields</td>
+                        <td>array</td>
+                        <td>query</td>
+                        <td>Поля сортировки <span class="opt">необяз.</span></td>
+                    </tr>
+                    <tr>
+                        <td>sortOrders</td>
+                        <td>array</td>
+                        <td>query</td>
+                        <td>Порядок: asc/desc <span class="opt">необяз.</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример — список всех клиентов</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">list_customers</span>(limit=<span
+                            class="num">100</span>, offset=<span class="num">0</span>) -> list:
+    params = {
+        <span class="str">'moduleName'</span>: <span class="str">'crm.customer'</span>,
+        <span class="str">'className'</span>: <span
+                                class="str">'ru.edgex.quickresto.modules.crm.customer.CrmCustomer'</span>,
+    }
+    body = {<span class="str">'limit'</span>: limit, <span class="str">'offset'</span>: offset}
+    r = session.<span class="fn">get</span>(f<span class="str">'{BASE_URL}/api/list'</span>, params=params, json=body)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()
+
+customers = <span class="fn">list_customers</span>(limit=<span class="num">50</span>)
+<span class="fn">print</span>(f<span class="str">'Получено: {len(customers)} клиентов'</span>)</pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример — список с фильтром и сортировкой</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">import</span> json
+
+<span class="kw">def</span> <span class="fn">list_dishes_filtered</span>():
+    filters = [
+        {<span class="str">'field'</span>: <span class="str">'deleted'</span>, <span
+                                class="str">'operation'</span>: <span class="str">'eq'</span>, <span
+                                class="str">'value'</span>: <span class="str">'false'</span>},
+    ]
+    params = {
+        <span class="str">'moduleName'</span>: <span class="str">'dish.dish'</span>,
+        <span class="str">'className'</span>: <span class="str">'ru.edgex.quickresto.modules.dish.Dish'</span>,
+        <span class="str">'filters'</span>: json.<span class="fn">dumps</span>(filters),  <span class="cmt"># ← сериализуем в JSON-строку!</span>
+        <span class="str">'sortFields'</span>: [<span class="str">'name'</span>],
+        <span class="str">'sortOrders'</span>: [<span class="str">'asc'</span>],
+    }
+    body = {<span class="str">'limit'</span>: <span class="num">200</span>}
+    r = session.<span class="fn">get</span>(f<span class="str">'{BASE_URL}/api/list'</span>, params=params, json=body)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- CREATE -->
+        <div class="section" id="create">
+            <div class="section-title"><span class="dot"></span>create — создать объект</div>
+            <p class="section-desc">Создаёт новый объект. Данные передаются в <strong>теле запроса</strong> в формате
+                JSON.</p>
+
+            <div class="card">
+                <div class="card-title"><span class="method post">POST</span> /api/create</div>
+                <table class="param-table">
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Тип</th>
+                        <th>Где</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>moduleName</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Имя модуля <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>className</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Полное имя класса <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>тело объекта</td>
+                        <td>object</td>
+                        <td>body</td>
+                        <td>Поля нового объекта <span class="req">*</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример — создать клиента</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">create_customer</span>(name: str, phone: str) -> dict:
+    params = {
+        <span class="str">'moduleName'</span>: <span class="str">'crm.customer'</span>,
+        <span class="str">'className'</span>: <span
+                                class="str">'ru.edgex.quickresto.modules.crm.customer.CrmCustomer'</span>,
+    }
+    body = {
+        <span class="str">'name'</span>: name,
+        <span class="str">'phone'</span>: phone,
+    }
+    r = session.<span class="fn">post</span>(f<span class="str">'{BASE_URL}/api/create'</span>, params=params, json=body)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()  <span
+                                class="cmt"># вернёт созданный объект с id</span>
+
+new_customer = <span class="fn">create_customer</span>(<span class="str">'Иван Петров'</span>, <span class="str">'+79991234567'</span>)
+<span class="fn">print</span>(<span class="str">'Создан с ID:'</span>, new_customer[<span
+                                class="str">'id'</span>])</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPDATE -->
+        <div class="section" id="update">
+            <div class="section-title"><span class="dot"></span>update — изменить объект</div>
+            <p class="section-desc">Обновляет существующий объект. В теле нужно передать <strong>id</strong> и
+                изменяемые поля.</p>
+
+            <div class="card">
+                <div class="card-title"><span class="method post">POST</span> /api/update</div>
+                <table class="param-table">
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Тип</th>
+                        <th>Где</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>moduleName</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Имя модуля <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>className</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Полное имя класса <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>id</td>
+                        <td>integer</td>
+                        <td>body</td>
+                        <td>ID объекта для обновления <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>поля</td>
+                        <td>object</td>
+                        <td>body</td>
+                        <td>Поля для изменения</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример — изменить email клиента</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">update_customer</span>(customer_id: <span
+                            class="fn">int</span>, **fields) -> dict:
+    params = {
+        <span class="str">'moduleName'</span>: <span class="str">'crm.customer'</span>,
+        <span class="str">'className'</span>: <span
+                                class="str">'ru.edgex.quickresto.modules.crm.customer.CrmCustomer'</span>,
+    }
+    body = {<span class="str">'id'</span>: customer_id, **fields}
+    r = session.<span class="fn">post</span>(f<span class="str">'{BASE_URL}/api/update'</span>, params=params, json=body)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()
+
+<span class="fn">update_customer</span>(<span class="num">42</span>, email=<span class="str">'<a
+                                href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                                data-cfemail="a5ccd3c4cbe5c8c4ccc98bd7d0">[email&#160;protected]</a>'</span>, name=<span
+                                class="str">'Иван Обновлённый'</span>)</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- REMOVE -->
+        <div class="section" id="remove">
+            <div class="section-title"><span class="dot"></span>remove — удалить объект</div>
+            <p class="section-desc">Удаляет объект по ID. В теле передаётся только <strong>id</strong>.</p>
+
+            <div class="card">
+                <div class="card-title"><span class="method post">POST</span> /api/remove</div>
+                <table class="param-table">
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Тип</th>
+                        <th>Где</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>moduleName</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Имя модуля <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>className</td>
+                        <td>string</td>
+                        <td>query</td>
+                        <td>Полное имя класса <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>id</td>
+                        <td>integer</td>
+                        <td>body</td>
+                        <td>ID объекта <span class="req">*</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример — удалить объект</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">remove_object</span>(module: str, cls: str, obj_id: <span
+                            class="fn">int</span>) -> dict:
+    params = {<span class="str">'moduleName'</span>: module, <span class="str">'className'</span>: cls}
+    r = session.<span class="fn">post</span>(
+        f<span class="str">'{BASE_URL}/api/remove'</span>,
+        params=params,
+        json={<span class="str">'id'</span>: obj_id}
+    )
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()
+
+<span class="cmt"># Удалить склад с ID 7</span>
+<span class="fn">remove_object</span>(
+    <span class="str">'warehouse.store'</span>,
+    <span class="str">'ru.edgex.quickresto.modules.warehouse.store.Store'</span>,
+    <span class="num">7</span>
+)</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="section" id="filters">
+            <div class="section-title"><span class="dot"></span>Фильтрация</div>
+            <p class="section-desc">Параметр <code>filters</code> — массив объектов. Каждый объект: <code>field</code> +
+                <code>operation</code> + <code>value</code>. Передаётся в query как JSON-строка.</p>
+
+            <div class="card">
+                <div class="card-title">Операции фильтрации</div>
+                <div class="ops-grid">
+                    <div class="op-item">
+                        <div class="op-name">eq</div>
+                        <div class="op-desc">равно</div>
+                    </div>
+                    <div class="op-item">
+                        <div class="op-name">neq</div>
+                        <div class="op-desc">не равно</div>
+                    </div>
+                    <div class="op-item">
+                        <div class="op-name">gt</div>
+                        <div class="op-desc">больше</div>
+                    </div>
+                    <div class="op-item">
+                        <div class="op-name">gte</div>
+                        <div class="op-desc">больше или равно</div>
+                    </div>
+                    <div class="op-item">
+                        <div class="op-name">lt</div>
+                        <div class="op-desc">меньше</div>
+                    </div>
+                    <div class="op-item">
+                        <div class="op-name">lte</div>
+                        <div class="op-desc">меньше или равно</div>
+                    </div>
+                    <div class="op-item">
+                        <div class="op-name">like</div>
+                        <div class="op-desc">содержит подстроку</div>
+                    </div>
+                    <div class="op-item">
+                        <div class="op-name">contains</div>
+                        <div class="op-desc">содержит элемент</div>
+                    </div>
+                    <div class="op-item">
+                        <div class="op-name">range</div>
+                        <div class="op-desc">диапазон дат</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Примеры фильтров</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">import</span> json
+
+<span class="cmt"># 1. По точному значению</span>
+filters = [{<span class="str">'field'</span>: <span class="str">'deleted'</span>, <span class="str">'operation'</span>: <span
+                                class="str">'eq'</span>, <span class="str">'value'</span>: <span
+                                class="str">'false'</span>}]
+
+<span class="cmt"># 2. Поиск по имени (LIKE)</span>
+filters = [{<span class="str">'field'</span>: <span class="str">'name'</span>, <span
+                                class="str">'operation'</span>: <span class="str">'like'</span>, <span class="str">'value'</span>: <span
+                                class="str">'Иван'</span>}]
+
+<span class="cmt"># 3. Диапазон дат (unix timestamp)</span>
+filters = [{
+    <span class="str">'field'</span>: <span class="str">'createTime'</span>,
+    <span class="str">'operation'</span>: <span class="str">'range'</span>,
+    <span class="str">'value'</span>: {
+        <span class="str">'since'</span>: <span class="str">'1700000000'</span>,
+        <span class="str">'till'</span>: <span class="str">'1710000000'</span>,
+    }
+}]
+
+<span class="cmt"># 4. Несколько фильтров сразу</span>
+filters = [
+    {<span class="str">'field'</span>: <span class="str">'deleted'</span>, <span class="str">'operation'</span>: <span
+                                class="str">'eq'</span>, <span class="str">'value'</span>: <span
+                                class="str">'false'</span>},
+    {<span class="str">'field'</span>: <span class="str">'name'</span>, <span class="str">'operation'</span>: <span
+                                class="str">'like'</span>, <span class="str">'value'</span>: <span
+                                class="str">'пицц'</span>},
+]
+
+<span class="cmt"># Передача в запрос:</span>
+params[<span class="str">'filters'</span>] = json.<span class="fn">dumps</span>(filters)</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SORTING -->
+        <div class="section" id="sorting">
+            <div class="section-title"><span class="dot"></span>Сортировка</div>
+            <p class="section-desc">Параметры <code>sortFields</code> и <code>sortOrders</code> передаются в query.
+                Количество элементов в обоих массивах должно совпадать.</p>
+
+            <div class="card">
+                <div class="card-title">🐍 Примеры сортировки</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="cmt"># По одному полю</span>
+params[<span class="str">'sortFields'</span>] = [<span class="str">'name'</span>]
+params[<span class="str">'sortOrders'</span>] = [<span class="str">'asc'</span>]
+
+<span class="cmt"># По нескольким полям</span>
+params[<span class="str">'sortFields'</span>] = [<span class="str">'groupId'</span>, <span class="str">'name'</span>]
+params[<span class="str">'sortOrders'</span>] = [<span class="str">'asc'</span>, <span class="str">'desc'</span>]
+
+<span class="cmt"># Внимание: requests передаст список как повторяющиеся параметры</span>
+<span class="cmt"># ?sortFields=groupId&sortFields=name — это ОК для QuickResto</span></pre>
+                </div>
+            </div>
+
+            <div class="alert warn">⚠️ Не все поля поддерживают сортировку — это указано в документации API. При ошибке
+                попробуйте убрать сортировку.
+            </div>
+        </div>
+
+        <!-- PAGINATION -->
+        <div class="section" id="pagination">
+            <div class="section-title"><span class="dot"></span>Пагинация</div>
+            <p class="section-desc">Используйте <code>limit</code> и <code>offset</code> в теле запроса для постраничной
+                загрузки.</p>
+
+            <div class="card">
+                <div class="card-title">🐍 Загрузка всех объектов постранично</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">fetch_all</span>(module: str, cls: str, page_size=<span
+                            class="num">100</span>) -> list:
+    result = []
+    offset = <span class="num">0</span>
+    params = {<span class="str">'moduleName'</span>: module, <span class="str">'className'</span>: cls}
+
+    <span class="kw">while True</span>:
+        body = {<span class="str">'limit'</span>: page_size, <span class="str">'offset'</span>: offset}
+        r = session.<span class="fn">get</span>(f<span class="str">'{BASE_URL}/api/list'</span>, params=params, json=body)
+        r.<span class="fn">raise_for_status</span>()
+        page = r.<span class="fn">json</span>()
+
+        <span class="kw">if not</span> page:
+            <span class="kw">break</span>
+
+        result.<span class="fn">extend</span>(page)
+        offset += page_size
+
+        <span class="kw">if</span> <span class="fn">len</span>(page) < page_size:
+            <span class="kw">break  </span><span class="cmt"># последняя страница</span>
+
+    <span class="kw">return</span> result
+
+all_dishes = <span class="fn">fetch_all</span>(<span class="str">'dish.dish'</span>, <span class="str">'ru.edgex.quickresto.modules.dish.Dish'</span>)
+<span class="fn">print</span>(f<span class="str">'Всего блюд: {len(all_dishes)}'</span>)</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- BONUSES FILTER -->
+        <div class="section" id="bonuses-filter">
+            <div class="section-title"><span class="dot"></span>filterCustomers — поиск клиента</div>
+            <p class="section-desc">Специализированный эндпоинт поиска клиентов по имени, телефону, email или любой
+                строке. Не требует <code>moduleName</code> и <code>className</code> — работает только с клиентами CRM.
+            </p>
+
+            <div class="alert info">ℹ️ URL отличается от стандартного — здесь нет <code>/api/</code>. Путь: <code>/bonuses/filterCustomers</code>
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span class="method post">POST</span> /bonuses/filterCustomers</div>
+                <table class="param-table">
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Тип</th>
+                        <th>Где</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>search</td>
+                        <td>string</td>
+                        <td>body</td>
+                        <td>Строка поиска (имя, телефон, email) <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>typeList</td>
+                        <td>array</td>
+                        <td>body</td>
+                        <td>Всегда <code>["customer"]</code> <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>limit</td>
+                        <td>integer</td>
+                        <td>body</td>
+                        <td>Макс. кол-во результатов <span class="opt">необяз.</span></td>
+                    </tr>
+                    <tr>
+                        <td>offset</td>
+                        <td>integer</td>
+                        <td>body</td>
+                        <td>Смещение <span class="opt">необяз.</span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример — найти клиента по телефону</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">find_customer</span>(search: str) -> list:
+    <span class="str">"""Поиск клиента по телефону, имени или email"""</span>
+    url = f<span class="str">'{BASE_URL}/bonuses/filterCustomers'</span>
+    <span class="cmt"># Обратите внимание: нет params с moduleName/className!</span>
+    payload = {
+        <span class="str">'search'</span>: search,
+        <span class="str">'typeList'</span>: [<span class="str">'customer'</span>],
+        <span class="str">'limit'</span>: <span class="num">10</span>,
+        <span class="str">'offset'</span>: <span class="num">0</span>,
+    }
+    r = session.<span class="fn">post</span>(url, json=payload)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()
+
+<span class="cmt"># Можно искать по-разному:</span>
+<span class="fn">find_customer</span>(<span class="str">'+79991234567'</span>)   <span class="cmt"># по телефону</span>
+<span class="fn">find_customer</span>(<span class="str">'Иван Петров'</span>)     <span class="cmt"># по имени</span>
+<span class="fn">find_customer</span>(<span class="str">'ivan@mail.ru'</span>)    <span
+                                class="cmt"># по email</span></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Сравнение с /api/list</div>
+                <table class="param-table">
+                    <tr>
+                        <th></th>
+                        <th>/bonuses/filterCustomers</th>
+                        <th>/api/list (crm.customer)</th>
+                    </tr>
+                    <tr>
+                        <td>HTTP метод</td>
+                        <td>POST</td>
+                        <td>GET</td>
+                    </tr>
+                    <tr>
+                        <td>Поиск по строке</td>
+                        <td style="color:var(--green)">✓ есть</td>
+                        <td style="color:var(--red)">✗ нет</td>
+                    </tr>
+                    <tr>
+                        <td>moduleName/className</td>
+                        <td style="color:var(--green)">не нужны</td>
+                        <td style="color:var(--red)">обязательны</td>
+                    </tr>
+                    <tr>
+                        <td>Фильтры по полям</td>
+                        <td style="color:var(--red)">✗ нет</td>
+                        <td style="color:var(--green)">✓ есть</td>
+                    </tr>
+                    <tr>
+                        <td>Когда использовать</td>
+                        <td>Поиск по строке</td>
+                        <td>Получить всех / фильтр по полю</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- BONUSES PUT -->
+        <div class="section" id="bonuses-put">
+            <div class="section-title"><span class="dot"></span>putCustomer — редактировать клиента</div>
+            <p class="section-desc">Ещё один специализированный эндпоинт CRM для обновления данных клиента. Альтернатива
+                <code>/api/update</code> для модуля клиентов.</p>
+
+            <div class="alert warn">⚠️ URL: <code>/bonuses/putCustomer</code> — без <code>/api/</code>, метод POST,
+                данные в body.
+            </div>
+
+            <div class="card">
+                <div class="card-title"><span class="method post">POST</span> /bonuses/putCustomer</div>
+                <table class="param-table">
+                    <tr>
+                        <th>Параметр</th>
+                        <th>Тип</th>
+                        <th>Где</th>
+                        <th>Описание</th>
+                    </tr>
+                    <tr>
+                        <td>id</td>
+                        <td>integer</td>
+                        <td>body</td>
+                        <td>ID клиента <span class="req">*</span></td>
+                    </tr>
+                    <tr>
+                        <td>поля клиента</td>
+                        <td>object</td>
+                        <td>body</td>
+                        <td>Поля для изменения</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🐍 Пример</div>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre><span class="kw">def</span> <span class="fn">put_customer</span>(customer_id: <span class="fn">int</span>, **fields) -> dict:
+    <span class="str">"""Обновить данные клиента через bonuses API"""</span>
+    url = f<span class="str">'{BASE_URL}/bonuses/putCustomer'</span>
+    payload = {<span class="str">'id'</span>: customer_id, **fields}
+    r = session.<span class="fn">post</span>(url, json=payload)
+    r.<span class="fn">raise_for_status</span>()
+    <span class="kw">return</span> r.<span class="fn">json</span>()
+
+<span class="fn">put_customer</span>(<span class="num">42</span>, email=<span class="str">'new@mail.ru'</span>, firstName=<span
+                                class="str">'Иван'</span>)</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODULES -->
+        <div class="section" id="modules">
+            <div class="section-title"><span class="dot"></span>Все модули API</div>
+            <p class="section-desc">Нажмите на модуль, чтобы скопировать параметры.</p>
+
+            <div id="modules-list"></div>
+        </div>
+
+        <!-- GENERATOR -->
+        <div class="section" id="generator">
+            <div class="section-title"><span class="dot"></span>Генератор запросов</div>
+            <p class="section-desc">Заполните параметры — получите готовый Python-код.</p>
+
+            <div class="card">
+                <div class="card-title">Настройки</div>
+                <div class="config-grid">
+                    <div class="config-input">
+                        <label>Облако (layer_name)</label>
+                        <input id="g-cloud" type="text" placeholder="demo" value="demo">
+                    </div>
+                    <div class="config-input">
+                        <label>Логин</label>
+                        <input id="g-login" type="text" placeholder="login">
+                    </div>
+                    <div class="config-input">
+                        <label>Пароль</label>
+                        <input id="g-pass" type="password" placeholder="password">
+                    </div>
+                    <div class="config-input">
+                        <label>Действие</label>
+                        <select id="g-action"
+                                style="background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none;">
+                            <option value="list">list (список)</option>
+                            <option value="read">read (один объект)</option>
+                            <option value="create">create (создать)</option>
+                            <option value="update">update (изменить)</option>
+                            <option value="remove">remove (удалить)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="config-grid">
+                    <div class="config-input" style="grid-column: 1 / -1;">
+                        <label>Модуль (moduleName)</label>
+                        <input id="g-module" type="text" placeholder="crm.customer">
+                    </div>
+                    <div class="config-input" style="grid-column: 1 / -1;">
+                        <label>Класс (className)</label>
+                        <input id="g-class" type="text"
+                               placeholder="ru.edgex.quickresto.modules.crm.customer.CrmCustomer">
+                    </div>
+                    <div class="config-input" id="g-id-wrap">
+                        <label>objectId / id</label>
+                        <input id="g-id" type="number" placeholder="42">
+                    </div>
+                    <div class="config-input">
+                        <label>limit</label>
+                        <input id="g-limit" type="number" placeholder="100" value="100">
+                    </div>
+                </div>
+                <button class="gen-btn" onclick="generate()">⚡ Сгенерировать код</button>
+            </div>
+
+            <div id="gen-output" style="display:none;">
+                <div class="code-block" style="margin-top:16px;">
+                    <button class="copy-btn" onclick="copyCode(this)">copy</button>
+                    <pre id="gen-code" style="color: var(--text);"></pre>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+    // Navigation
+    function show(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // Copy code
+    function copyCode(btn) {
+      const pre = btn.closest('.code-block').querySelector('pre');
+      navigator.clipboard.writeText(pre.innerText).then(() => {
+        btn.textContent = 'copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 1500);
+      });
+    }
+
+    // Modules data
+    const modules = [
+      { name: 'Клиенты', mod: 'crm.customer', cls: 'ru.edgex.quickresto.modules.crm.customer.CrmCustomer', ops: ['read','list','create','update','remove'] },
+      { name: 'Группы клиентов', mod: 'crm.customerGroup', cls: 'ru.edgex.quickresto.modules.crm.customer.CrmCustomerGroup', ops: ['read','list','create','update','remove'] },
+      { name: 'Блюда', mod: 'dish.dish', cls: 'ru.edgex.quickresto.modules.dish.Dish', ops: ['read','list','create','update','remove'] },
+      { name: 'Модификаторы', mod: 'dish.modificatorItem', cls: 'ru.edgex.quickresto.modules.dish.ModificatorItem', ops: ['read','list'] },
+      { name: 'Ингредиенты', mod: 'warehouse.nomenclature', cls: 'ru.edgex.quickresto.modules.warehouse.nomenclature.Nomenclature', ops: ['read','list','create','update'] },
+      { name: 'Полуфабрикаты', mod: 'warehouse.semiFinished', cls: 'ru.edgex.quickresto.modules.warehouse.semiFinished.SemiFinished', ops: ['read','list'] },
+      { name: 'Склады', mod: 'warehouse.store', cls: 'ru.edgex.quickresto.modules.warehouse.store.Store', ops: ['read','list','update','remove'] },
+      { name: 'Контрагенты', mod: 'warehouse.providers', cls: 'ru.edgex.quickresto.modules.warehouse.providers.concrete.ConcreteProvider', ops: ['read','list'] },
+      { name: 'Чеки', mod: 'front.cashCheck', cls: 'ru.edgex.quickresto.modules.front.cashCheck.CashCheck', ops: ['read','list'] },
+      { name: 'Кассовые смены', mod: 'front.cashShift', cls: 'ru.edgex.quickresto.modules.front.cashShift.CashShift', ops: ['read','list'] },
+      { name: 'Сотрудники', mod: 'personal.employee', cls: 'ru.edgex.quickresto.modules.personal.employee.Employee', ops: ['read','list','create','update'] },
+      { name: 'Заведения', mod: 'restaurant.restaurant', cls: 'ru.edgex.quickresto.modules.restaurant.Restaurant', ops: ['read','list'] },
+      { name: 'Терминалы', mod: 'restaurant.terminal', cls: 'ru.edgex.quickresto.modules.restaurant.Terminal', ops: ['read','list'] },
+      { name: 'Единицы измерения', mod: 'warehouse.unit', cls: 'ru.edgex.quickresto.modules.warehouse.unit.Unit', ops: ['read','list'] },
+      { name: 'Типы оплат', mod: 'front.paymentType', cls: 'ru.edgex.quickresto.modules.front.paymentType.PaymentType', ops: ['read','list'] },
+      { name: 'Приходные накладные', mod: 'warehouse.incomingDoc', cls: 'ru.edgex.quickresto.modules.warehouse.incomingDoc.IncomingDoc', ops: ['read','list','create'] },
+      { name: 'Акты инвентаризации', mod: 'warehouse.inventoryDoc', cls: 'ru.edgex.quickresto.modules.warehouse.inventoryDoc.InventoryDoc', ops: ['read','list'] },
+      { name: 'Акты списания', mod: 'warehouse.writeOffDoc', cls: 'ru.edgex.quickresto.modules.warehouse.writeOffDoc.WriteOffDoc', ops: ['read','list','create'] },
+      { name: 'Бонусные программы', mod: 'crm.bonus', cls: 'ru.edgex.quickresto.modules.crm.bonus.CrmBonus', ops: ['read','list'] },
+      { name: 'Акции', mod: 'crm.campaign', cls: 'ru.edgex.quickresto.modules.crm.campaign.Campaign', ops: ['read','list'] },
+    ];
+
+    function buildModules() {
+      const container = document.getElementById('modules-list');
+      modules.forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `
+          <div class="card-title" style="justify-content:space-between">
+            <span>${m.name}</span>
+            <span style="display:flex;gap:6px">${m.ops.map(o => `<span class="method ${['read','list'].includes(o)?'get':'post'}">${o}</span>`).join('')}</span>
+          </div>
+          <table class="param-table">
+            <tr><td>moduleName</td><td colspan="2" style="color:var(--green)">${m.mod}</td></tr>
+            <tr><td>className</td><td colspan="2" style="color:var(--green);font-size:11px">${m.cls}</td></tr>
+          </table>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <button class="copy-btn" style="position:static" onclick="copyModuleName('${m.mod}', this)">copy moduleName</button>
+            <button class="copy-btn" style="position:static" onclick="copyClassName('${m.cls}', this)">copy className</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function copyModuleName(val, btn) {
+      navigator.clipboard.writeText(val).then(() => {
+        btn.textContent = 'copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'copy moduleName'; btn.classList.remove('copied'); }, 1500);
+      });
+    }
+    function copyClassName(val, btn) {
+      navigator.clipboard.writeText(val).then(() => {
+        btn.textContent = 'copied!'; btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'copy className'; btn.classList.remove('copied'); }, 1500);
+      });
+    }
+
+    // Generator
+    function generate() {
+      const cloud = document.getElementById('g-cloud').value || 'demo';
+      const login = document.getElementById('g-login').value || 'login';
+      const pw = document.getElementById('g-pass').value || 'password';
+      const action = document.getElementById('g-action').value;
+      const mod = document.getElementById('g-module').value || 'crm.customer';
+      const cls = document.getElementById('g-class').value || 'ru.edgex.quickresto.modules.crm.customer.CrmCustomer';
+      const objId = document.getElementById('g-id').value || '1';
+      const limit = document.getElementById('g-limit').value || '100';
+
+      const baseUrl = `https://${cloud}.quickresto.ru/platform/online`;
+
+      let code = `import requests\n\nsession = requests.Session()\nsession.auth = ('${login}', '${pw}')\nsession.headers.update({\n    'Content-Type': 'application/json',\n    'Connection': 'keep-alive',\n})\n\nBASE_URL = '${baseUrl}'\n\n`;
+
+      const params = `params = {\n    'moduleName': '${mod}',\n    'className': '${cls}',\n}`;
+
+      if (action === 'read') {
+        code += `${params.replace('}', `    'objectId': ${objId},\n}`)}\n\nr = session.get(f'{BASE_URL}/api/read', params=params)\nr.raise_for_status()\ndata = r.json()\nprint(data)`;
+      } else if (action === 'list') {
+        code += `${params}\nbody = {'limit': ${limit}, 'offset': 0}\n\nr = session.get(f'{BASE_URL}/api/list', params=params, json=body)\nr.raise_for_status()\ndata = r.json()\nprint(f'Получено: {len(data)} объектов')`;
+      } else if (action === 'create') {
+        code += `${params}\nbody = {\n    # добавьте поля объекта\n    'name': 'Новый объект',\n}\n\nr = session.post(f'{BASE_URL}/api/create', params=params, json=body)\nr.raise_for_status()\ncreated = r.json()\nprint('Создан с ID:', created['id'])`;
+      } else if (action === 'update') {
+        code += `${params}\nbody = {\n    'id': ${objId},\n    # добавьте поля для изменения\n    'name': 'Новое имя',\n}\n\nr = session.post(f'{BASE_URL}/api/update', params=params, json=body)\nr.raise_for_status()\nupdated = r.json()\nprint('Обновлено:', updated)`;
+      } else if (action === 'remove') {
+        code += `${params}\n\nr = session.post(f'{BASE_URL}/api/remove', params=params, json={'id': ${objId}})\nr.raise_f
