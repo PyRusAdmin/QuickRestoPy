@@ -4,16 +4,16 @@ import requests
 from config.config import base_url, auth, headers
 
 
-def get_all_clients():
+def get_all_clients(base_url, auth, headers):
     """Получает данные о всех клиентах"""
 
     all_clients = []
-    limit = 500  # Максимально рекомендуемый размер порции для Quick Resto
-    offset = 0  # Это смещение. Сначала мы берем первых 500 (с 0-го по 499-го).
+    limit = 500
+    offset = 0
 
     print("🚀 Начинаю загрузку всех клиентов...")
 
-    while True:  # Бесконечный цикл пока не соберет все данные (клиентов)
+    while True:
         url = f"{base_url}/list"
         query_params = {
             "moduleName": "crm.customer",

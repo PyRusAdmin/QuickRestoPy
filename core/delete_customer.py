@@ -43,6 +43,6 @@ def delete_customer(customer_id: int, base_url, auth, headers):
         logger.exception(e)
 
 
-"""Удаление клиента по ID"""
-
-delete_customer(customer_id=7711, base_url=base_url, auth=auth, headers=headers)
+if __name__ == "__main__":
+    from config.config import base_url, auth, headers
+    delete_customer(customer_id=7711, base_url=base_url, auth=auth, headers=headers)
