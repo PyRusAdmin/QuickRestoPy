@@ -4,13 +4,18 @@ import json
 from rich.console import Console
 from rich.prompt import Prompt
 
+from config.config import layer_name_quickresto, username_quickresto, password_quickresto
 from core.quickresto_client import QuickRestoClient
 
 console = Console()
 
 
 def main():
-    client = QuickRestoClient()
+    client = QuickRestoClient(
+        layer_name_quickresto=layer_name_quickresto,
+        username_quickresto=username_quickresto,
+        password_quickresto=password_quickresto,
+    )
 
     menu_items = [
         ("get_all_clients", "Получить всех клиентов", client.get_all_clients),

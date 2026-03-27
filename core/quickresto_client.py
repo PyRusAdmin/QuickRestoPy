@@ -1,22 +1,17 @@
 # -*- coding: utf-8 -*-
-import os
-
 import requests
-from dotenv import load_dotenv
 from loguru import logger
 from requests.auth import HTTPBasicAuth
 
-load_dotenv(override=True)
-
 
 class QuickRestoClient:
-    def __init__(self, layer_name=None, username=None, password=None):
-        self.layer_name = layer_name or os.getenv("LAYER_NAME_QUICKRESTO")
-        self.username = username or os.getenv("USERNAME_QUICKRESTO")
-        self.password = password or os.getenv("PASSWORD_QUICKRESTO")
+    def __init__(self, layer_name_quickresto=None, username_quickresto=None, password_quickresto=None):
+        self.layer_name_quickresto = layer_name_quickresto
+        self.username_quickresto = username_quickresto
+        self.password_quickresto = password_quickresto
 
-        self.base_url = f"https://{self.layer_name}.quickresto.ru/platform/online/api"
-        self.auth = HTTPBasicAuth(self.username, self.password)
+        self.base_url = f"https://{self.layer_name_quickresto}.quickresto.ru/platform/online/api"
+        self.auth = HTTPBasicAuth(self.username_quickresto, self.password_quickresto)
         self.headers = {"Content-Type": "application/json"}
 
     def get_all_clients(self):
@@ -113,7 +108,7 @@ class QuickRestoClient:
 
     def get_client_by_phone(self, phone):
         """Найти клиента по номеру телефона"""
-        url = f"https://{self.layer_name}.quickresto.ru/platform/online/bonuses/filterCustomers"
+        url = f"https://{self.layer_name_quickresto}.quickresto.ru/platform/online/bonuses/filterCustomers"
         payload = {'search': phone, 'typeList': ['customer'], 'limit': 10, 'offset': 0}
 
         try:
@@ -126,7 +121,7 @@ class QuickRestoClient:
 
     def update_bonus(self, customer_id, amount, phone):
         """Обновить бонусы клиента"""
-        url = f"https://{self.layer_name}.quickresto.ru/platform/online/bonuses/creditHold"
+        url = f"https://{self.layer_name_quickresto}.quickresto.ru/platform/online/bonuses/creditHold"
         body = {
             "customerToken": {"type": "phone", "entry": "manual", "key": phone},
             "accountType": {"accountGuid": "bonus_account_type-1"},
