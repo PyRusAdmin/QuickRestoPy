@@ -12,58 +12,7 @@ from get_client_phone import print_client_info
 # https://quickresto.ru/api/
 
 
-def get_all_clients():
-    """Получает данные о всех клиентах"""
 
-    all_clients = []
-    limit = 500  # Максимально рекомендуемый размер порции для Quick Resto
-    offset = 0  # Это смещение. Сначала мы берем первых 500 (с 0-го по 499-го).
-
-    print("🚀 Начинаю загрузку всех клиентов...")
-
-    while True:  # Бесконечный цикл пока не соберет все данные (клиентов)
-        url = f"{base_url}/list"
-        query_params = {
-            "moduleName": "crm.customer",
-            "className": "ru.edgex.quickresto.modules.crm.customer.CrmCustomer"
-        }
-        payload = {
-            "limit": limit,
-            "offset": offset
-        }
-
-        try:
-            response = requests.get(
-                url,
-                params=query_params,
-                json=payload,
-                auth=auth,
-                headers=headers,
-                timeout=30
-            )
-            response.raise_for_status()
-
-            batch = response.json()
-
-            if not batch:
-                # Если сервер вернул пустой список, значит мы дошли до конца
-                break
-
-            all_clients.extend(batch)
-            print(f"📥 Загружено: {len(all_clients)}...")
-
-            # Увеличиваем offset для следующей "страницы"
-            offset += limit
-
-            # Если вернулось меньше, чем мы просили, значит это была последняя страница
-            if len(batch) < limit:
-                break
-
-        except Exception as e:
-            print(f"❌ Ошибка на смещении {offset}: {e}")
-            break
-
-    return all_clients
 
 
 if __name__ == "__main__":
